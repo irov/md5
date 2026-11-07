@@ -1,0 +1,19 @@
+name: build
+
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        configuration: [Debug, Release]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - run: cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.configuration }}
+      - run: cmake --build build --config ${{ matrix.configuration }}
+      - run: ctest --test-dir build -C ${{ matrix.configuration }} --output-on-failure
